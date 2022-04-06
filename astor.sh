@@ -1,7 +1,7 @@
 #!/bin/bash
 
-jtestex7_jar="/Users/cuong/PycharmProjects/APRPlatform/astor/jtestex7.jar"
-astor_jar="/Users/cuong/PycharmProjects/APRPlatform/astor/astor.jar"
+jtestex7_jar="/opt/astor/jtestex7.jar"
+astor_jar="/opt/astor/astor.jar"
 
 args="$@"
 jvm_version="$2"
@@ -28,4 +28,4 @@ echo "--> repair cmd=$repair_cmd"
 echo "--------------------------"
 
 echo "Running repair..."
-echo $repair_cmd
+$repair_cmd
