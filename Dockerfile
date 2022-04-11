@@ -12,6 +12,7 @@ RUN apt update \
 COPY jdk-7u80-linux-x64.tar.gz /tmp/jdk-7u80-linux-x64.tar.gz
 RUN tar xvzf /tmp/jdk-7u80-linux-x64.tar.gz -C /tmp/
 RUN mv /tmp/jdk1.7.0_80 /usr/lib/jvm/jdk1.7.0_80/
+RUN rm /tmp/jdk-7u80-linux-x64.tar.gz
 
 ENV JAVA7_HOME /usr/lib/jvm/jdk1.7.0_80
 ENV JAVA8_HOME /usr/lib/jvm/java-8-openjdk-amd64
