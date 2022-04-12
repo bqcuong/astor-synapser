@@ -23,9 +23,10 @@ class JKali(ToolHandler):
         test_class = repair_args.get('test_class')
         classpath = repair_args.get('classpath')
         jvm_version = repair_args.get('jvm_version')
+        project_name = repair_args.get('project_name')
 
         self.repair_cmd.add_arg('-jvmversion', jvm_version)
-        self.repair_cmd.add_arg('-location', repair_request.working_dir)
+        self.repair_cmd.add_arg('-location', repair_request.working_dir / project_name)
         self.repair_cmd.add_arg('-srcjavafolder', src)
         self.repair_cmd.add_arg('-srctestfolder', test)
         self.repair_cmd.add_arg('-binjavafolder', src_class)
