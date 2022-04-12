@@ -17,6 +17,8 @@ else
 fi
 
 jvmpath="$JAVA_HOME/bin"
+export PATH="$jvmpath:$PATH"
+
 args="$args -javacompliancelevel $jvm_version -jvm4testexecution $jvmpath -jvm4evosuitetestexecution $jvmpath"
 
 # remove the -jvmversion from argument list
