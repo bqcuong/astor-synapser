@@ -33,6 +33,9 @@ class JKali(ToolHandler):
         self.repair_cmd.add_arg('-bintestfolder', test_class)
         self.repair_cmd.add_arg('-dependencies', classpath)
 
+        for opt, arg in signals.items():
+            self.repair_cmd.add_arg(opt=opt, arg=arg)
+
         return self.repair_cmd
 
     def get_patches(self, working_dir: str, target_files: List[str], **kwargs) -> Dict[str, Any]:

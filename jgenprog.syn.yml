@@ -1,6 +1,9 @@
 jgenprog:
   program: "astor.sh"
   path: "/opt/astor"
+  api_cmds:
+    -testallcmd: test
+    -testfailingcmd: test
   args:
     -mode: "jgenprog"
     -maxgen: "1000000"
@@ -9,3 +12,4 @@ jgenprog:
     -seed: "0"
     -scope: "local"
     -population: "1"
+    -validation: "externalcmd"
