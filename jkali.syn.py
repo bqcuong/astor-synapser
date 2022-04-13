@@ -34,7 +34,7 @@ class JKali(ToolHandler):
         self.repair_cmd.add_arg('-dependencies', classpath)
 
         for opt, arg in signals.items():
-            self.repair_cmd.add_arg(opt=opt, arg=arg)
+            self.repair_cmd.add_arg(opt=opt, arg='"' + arg + '"')
 
         return self.repair_cmd
 
