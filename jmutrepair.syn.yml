@@ -13,3 +13,4 @@ jmutrepair:
     -scope: "local"
     -population: "1"
     -validation: "externalcmd"
+    -faultlocalization: "perfect"
