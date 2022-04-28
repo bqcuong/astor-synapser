@@ -1,6 +1,9 @@
 jmutrepair:
   program: "astor.sh"
   path: "/opt/astor"
+  api_cmds:
+    -testallcmd: test
+    -testfailingcmd: test
   args:
     -mode: "jmutrepair"
     -maxgen: "1000000"
@@ -9,3 +12,5 @@ jmutrepair:
     -seed: "0"
     -scope: "local"
     -population: "1"
+    -validation: "externalcmd"
+    -faultlocalization: "perfect"

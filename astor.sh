@@ -34,4 +34,4 @@ echo "--> repair cmd=$repair_cmd"
 echo "--------------------------"
 
 echo "Running repair..."
-$repair_cmd
+bash -c "$repair_cmd"
