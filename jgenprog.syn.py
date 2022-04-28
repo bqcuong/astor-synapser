@@ -1,57 +1,69 @@
-from nexus.core.data.context import Context
-from nexus.core.data.store import Program, Vulnerability, Command, Signal
-from nexus.core.handlers.nexus import NexusHandler
+import json
+import os
+from typing import List, Any, Dict
+
+from synapser.core.data.api import RepairRequest
+from synapser.core.data.results import RepairCommand
+from synapser.core.database import Signal
+from synapser.handlers.tool import ToolHandler
 
 
-class JGenProgVul4JRepairTask(NexusHandler):
+class JGenProg(ToolHandler):
+    """JGenProg"""
+
     class Meta:
-        label = 'jgenprog_vul4j'
+        label = 'jgenprog'
+        version = 'xyz'
 
-    def __init__(self, **kw):
-        super().__init__(tool='jgenprog', benchmark='vul4j', **kw)
+    def repair(self, signals: dict, repair_request: RepairRequest) -> RepairCommand:
+        repair_args = repair_request.args
+        src = repair_args.get('src')
+        test = repair_args.get('test')
+        src_class = repair_args.get('src_class')
+        test_class = repair_args.get('test_class')
+        classpath = repair_args.get('classpath')
+        jvm_version = repair_args.get('jvm_version')
+        project_name = repair_args.get('project_name')
+        perfect_data = repair_args.get('perfect_data')
 
-    def run(self, program: Program, vulnerability: Vulnerability, context: Context):
-        program_modules = program.modules
-        vulnerability_manifest = vulnerability.get_manifest()
+        self.repair_cmd.add_arg('-jvmversion', jvm_version)
+        self.repair_cmd.add_arg('-location', repair_request.working_dir / project_name)
+        self.repair_cmd.add_arg('-srcjavafolder', src)
+        self.repair_cmd.add_arg('-srctestfolder', test)
+        self.repair_cmd.add_arg('-binjavafolder', src_class)
+        self.repair_cmd.add_arg('-bintestfolder', test_class)
+        self.repair_cmd.add_arg('-dependencies', classpath)
+        self.repair_cmd.add_arg('-perfectdata', repair_request.working_dir / project_name / perfect_data)
 
-        # checkout and pre-build the vulnerability
-        program_instance = self.orbis.checkout(context.benchmark.instance, vuln=vulnerability)
-        self.orbis.build(context.benchmark.instance, program_instance=program_instance, args={})
-        cp_res = self.orbis.get_classpath(context.benchmark.instance, program_instance=program_instance)
+        for opt, arg in signals.items():
+            self.repair_cmd.add_arg(opt=opt, arg='"' + arg + '"')
 
-        # the project named is used to merge with universal working_dir defined here
-        # e.g., /nexus/vul4j_a1bc/ ->/nexus/vul4j_a1bc/vul4j
-        repair_args = {
-            'src': program_modules.get('src_dir'),
-            'test': program_modules.get('test_dir'),
-            'src_class': program_modules.get('src_classes'),
-            'test_class': program_modules.get('test_classes'),
-            'jvm_version': program.build.get('version'),
-            'classpath': cp_res,
-            'project_name': program.name,
-            'perfect_data': 'VUL4J/' + vulnerability.id
-        }
+        self.repair_cmd.cwd = str(repair_request.working_dir / project_name)
+        return self.repair_cmd
 
-        # orbis_test_url = self.orbis.url(action='test', instance=context.benchmark.instance)
-        orbis_testbatch_url = "http://172.17.0.2:8080/testbatch"  # for only testing on my machine
+    def get_patches(self, working_dir: str, target_files: List[str], **kwargs) -> Dict[str, Any]:
+        patches_folder = "output_astor"
+        patches = {"patches": []}
 
-        test_all_cmd = Command(iid=program_instance.iid,
-                               url=orbis_testbatch_url)
-        test_all_cmd.add_placeholder(name='batch', value='all')
-        test_all_signal = Signal(arg='-testallcmd', command=test_all_cmd)
+        project_name = [child_dir for child_dir in os.listdir(working_dir)
+                        if os.path.isdir(os.path.join(working_dir, child_dir))][0]
+        path_results = os.path.join(working_dir, project_name, patches_folder)
 
-        test_povs_cmd = Command(iid=program_instance.iid,
-                                url=orbis_testbatch_url)
-        test_povs_cmd.add_placeholder(name='batch', value='povs')
-        test_failing_signal = Signal(arg='-testfailingcmd', command=test_povs_cmd)
+        if os.path.exists(path_results):
+            for root, dirnames, filenames in os.walk(path_results):
+                for filename in filenames:
+                    if filename == "astor_output.json":
+                        with open(os.path.join(root, filename)) as fd:
+                            data = json.load(fd)
+                            patches["patches"] = data["patches"]
+        return patches
 
-        response = self.synapser.repair(signals=[test_all_signal, test_failing_signal], args=repair_args,
-                                        program_instance=program_instance,
-                                        manifest=vulnerability_manifest.locs,
-                                        instance=context.tool.instance)
-        response_json = response.json()
-        self.app.log.info("RID: " + str(response_json['rid']))
+    def parse_extra(self, extra_args: List[str], signal: Signal) -> str:
+        """
+            Parses extra arguments in the signals.
+        """
+        return ""
 
 
-def load(app):
-    app.handler.register(JGenProgVul4JRepairTask)
+def load(nexus):
+    nexus.handler.register(JGenProg)
