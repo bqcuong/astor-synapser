@@ -2,8 +2,8 @@ jgenprog:
   program: "astor.sh"
   path: "/opt/astor"
   api_cmds:
-    -testallcmd: test
-    -testfailingcmd: test
+    -testallcmd: testbatch
+    -testfailingcmd: testbatch
   args:
     -mode: "jgenprog"
     -maxgen: "1000000"

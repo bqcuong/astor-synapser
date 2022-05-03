@@ -2,8 +2,8 @@ jmutrepair:
   program: "astor.sh"
   path: "/opt/astor"
   api_cmds:
-    -testallcmd: test
-    -testfailingcmd: test
+    -testallcmd: testbatch
+    -testfailingcmd: testbatch
   args:
     -mode: "jmutrepair"
     -maxgen: "1000000"
