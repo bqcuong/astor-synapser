@@ -1,22 +1,16 @@
-FROM ubuntu:20.04
-
-ENV DEBIAN_FRONTEND=noninteractive
-ENV LANG=C.UTF-8
+FROM bqcuongas/java:latest
 
 # install required softwares
 RUN apt update \
-    && apt install -y wget curl git python vim unzip bzip2 xz-utils \
-    openjdk-8-jdk \
-    openssh-client patch build-essential
+    && apt install -y wget curl vim zsh patch \
+    unzip bzip2 xz-utils \
+    git \
+    python3 python3-pip \
+    maven
+    
+RUN wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh || true
     
 COPY ./ /opt/astor
 WORKDIR /opt/astor
 
-RUN tar xvzf jdk-7u80-linux-x64.tar.gz -C /tmp/
-RUN mv /tmp/jdk1.7.0_80 /usr/lib/jvm/jdk1.7.0_80/
-RUN rm jdk-7u80-linux-x64.tar.gz
-
-ENV JAVA7_HOME /usr/lib/jvm/jdk1.7.0_80
-ENV JAVA8_HOME /usr/lib/jvm/java-8-openjdk-amd64
-ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
 ENV SYNAPSER_PLUGIN_PATH /opt/astor
