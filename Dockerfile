@@ -13,4 +13,8 @@ RUN wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -
 COPY ./ /opt/astor
 WORKDIR /opt/astor
 
+# pre-install synapser
 ENV SYNAPSER_PLUGIN_PATH /opt/astor
+RUN apt-get install -y git curl
+RUN cd /tmp; git clone https://github.com/epicosy/synapser
+RUN cd /tmp/synapser; ./install_py38.sh; ./install.sh
